@@ -3,6 +3,7 @@
 
 declare dataset="Wine"
 declare batch_size=100
+declare epochs=200
 
 declare m_perc=20
 declare mask=1
@@ -13,14 +14,14 @@ declare miss_file=${dataset}/Missing${m_perc}_${mask}.csv
 declare true_miss_file=${dataset}/MissingTrue.csv
 
 
-declare model="model_HIVAE_inputDropout"
+declare model="model_HIVAE_inputDropout" # or model_HIVAE_factorized
 declare z_dim=2
 declare y_dim=5
 declare s_dim=10
 
 
 train_model(){
-    python main_scripts.py --model_name $1 --batch_size ${batch_size} --epochs 200 \
+    python main_scripts.py --model_name $1 --batch_size ${batch_size} --epochs ${epochs} \
     --data_file ${data_file} --types_file ${types_file} --miss_file ${miss_file} \
     --dim_latent_z $2 --dim_latent_y $3 --dim_latent_s $4 \
     --save_file ${save_file} \

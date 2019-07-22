@@ -64,7 +64,7 @@ with tf.Session(graph=sess_HVAE) as session:
     # Add ops to save and restore all the variables.
     saver = tf.train.Saver()
 
-    if (args.restore == 1):
+    if args.restore == 1:
         saver.restore(session, network_file_name)
         print("Model restored.")
     else:
@@ -73,7 +73,7 @@ with tf.Session(graph=sess_HVAE) as session:
         tf.global_variables_initializer().run()
 
     print('Training the HVAE ...')
-    if (args.train == 1):
+    if args.train == 1:
 
         start_time = time.time()
         # Training cycle
