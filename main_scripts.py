@@ -62,7 +62,7 @@ with sess_HVAE.as_default():
 
 with tf.Session(graph=sess_HVAE) as session:
     # Add ops to save and restore all the variables.
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
 
     if args.restore == 1:
         saver.restore(session, network_file_name)
@@ -70,7 +70,7 @@ with tf.Session(graph=sess_HVAE) as session:
     else:
         #        saver = tf.train.Saver()
         print('Initizalizing Variables ...')
-        tf.global_variables_initializer().run()
+        tf.compat.v1.global_variables_initializer().run()
 
     print('Training the HVAE ...')
     if args.train == 1:
@@ -114,28 +114,38 @@ with tf.Session(graph=sess_HVAE) as session:
                 data_list_observed = [data_list[i] * np.reshape(miss_list[:, i], [args.batch_size, 1]) for i in
                                       range(len(data_list))]
 
-                ##                Delete not known data (mean inputation)
-                #                data_list_observed = []
-                ##                data_mean = np.mean(train_data_aux,0)
-                ##                initial_index = 0
-                #                for d in range(len(data_list)):
-                #                    data_mean = np.mean(data_list[d][miss_list[:,d]==1,:],0)
-                ##                    dim = int(types_dict[i]['dim'])
-                #                    if types_dict[d]['type'] == 'real' or types_dict[d]['type'] == 'pos':
-                #                        data_mean = np.mean(data_list[d][miss_list[:,d]==1,:],0)
-                #                        data_list_observed.append(data_list[d]*np.reshape(miss_list[:,d],[args.batch_size,1]) + data_mean*np.reshape(1-miss_list[:,d],[args.batch_size,1]))
-                #                    elif types_dict[d]['type'] == 'cat':
-                #                        data_median = (np.mean(data_list[d][miss_list[:,d]==1,:],0)==np.max(np.mean(data_list[d][miss_list[:,d]==1,:],0))).astype(float)
-                #                        data_list_observed.append(data_list[d]*np.reshape(miss_list[:,d],[args.batch_size,1]) + data_median*np.reshape(1-miss_list[:,d],[args.batch_size,1]))
-                #                    elif types_dict[d]['type'] == 'ordinal':
-                #                        data_median = (np.mean(data_list[d][miss_list[:,d]==1,:],0)>=0.5).astype(float)
-                #                        data_list_observed.append(data_list[d]*np.reshape(miss_list[:,d],[args.batch_size,1]) + data_median*np.reshape(1-miss_list[:,d],[args.batch_size,1]))
-                #                    else:
-                #                        data_median = np.median(data_list[d][miss_list[:,d]==1,:],0)
-                #                        data_list_observed.append(data_list[d]*np.reshape(miss_list[:,d],[args.batch_size,1]) + data_median*np.reshape(1-miss_list[:,d],[args.batch_size,1]))
-                ##                        data_list_observed.append(data_list[d]*np.reshape(miss_list[:,d],[args.batch_size,1]))
-                ##                    data_list_observed.append(data_list[i]*np.reshape(miss_list[:,i],[args.batch_size,1]) + data_mean*np.reshape(1-miss_list[:,i],[args.batch_size,1]))
-                ##                    initial_index += dim
+                # # Delete not known data (mean imputation)
+                # data_list_observed = []
+                # # data_mean = np.mean(train_data_aux,0)
+                # # initial_index = 0
+                # for d in range(len(data_list)):
+                #     data_mean = np.mean(data_list[d][miss_list[:, d] == 1, :], 0)
+                #     # dim = int(types_dict[i]['dim'])
+                #     if types_dict[d]['type'] == 'real' or types_dict[d]['type'] == 'pos':
+                #         data_mean = np.mean(data_list[d][miss_list[:, d] == 1, :], 0)
+                #         data_list_observed.append(
+                #             data_list[d] * np.reshape(miss_list[:, d], [args.batch_size, 1]) + data_mean * np.reshape(
+                #                 1 - miss_list[:, d], [args.batch_size, 1]))
+                #     elif types_dict[d]['type'] == 'cat':
+                #         data_median = (np.mean(data_list[d][miss_list[:, d] == 1, :], 0) == np.max(
+                #             np.mean(data_list[d][miss_list[:, d] == 1, :], 0))).astype(float)
+                #         data_list_observed.append(
+                #             data_list[d] * np.reshape(miss_list[:, d], [args.batch_size, 1]) + data_median * np.reshape(
+                #                 1 - miss_list[:, d], [args.batch_size, 1]))
+                #     elif types_dict[d]['type'] == 'ordinal':
+                #         data_median = (np.mean(data_list[d][miss_list[:, d] == 1, :], 0) >= 0.5).astype(float)
+                #         data_list_observed.append(
+                #             data_list[d] * np.reshape(miss_list[:, d], [args.batch_size, 1]) + data_median * np.reshape(
+                #                 1 - miss_list[:, d], [args.batch_size, 1]))
+                #     else:
+                #         data_median = np.median(data_list[d][miss_list[:, d] == 1, :], 0)
+                #         data_list_observed.append(
+                #             data_list[d] * np.reshape(miss_list[:, d], [args.batch_size, 1]) + data_median * np.reshape(
+                #                 1 - miss_list[:, d], [args.batch_size, 1]))
+                #     # data_list_observed.append(data_list[d]*np.reshape(miss_list[:,d],[args.batch_size,1]))
+                #     # data_list_observed.append(data_list[i]*np.reshape(miss_list[:,i],[args.batch_size,1]) \
+                #     #           + data_mean*np.reshape(1-miss_list[:,i],[args.batch_size,1]))
+                #     # initial_index += dim
 
                 # Create feed dictionary
                 feedDict = {i: d for i, d in zip(tf_nodes['ground_batch'], data_list)}
@@ -416,7 +426,7 @@ with tf.Session(graph=sess_HVAE) as session:
 
             # Display logs per epoch step
             if args.display == 1:
-                #            print_loss(0, start_time, avg_loss/n_batches, avg_test_loglik, avg_KL_s/n_batches, avg_KL_z/n_batches)
+                # print_loss(0, start_time, avg_loss/n_batches, avg_test_loglik, avg_KL_s/n_batches, avg_KL_z/n_batches)
                 print(np.round(error_test_mode, 3))
                 print('Test error mode: ' + str(np.round(np.mean(error_test_mode), 3)))
                 print("")

@@ -62,13 +62,15 @@ def cost_function(log_p_x, p_params, q_params, types_list, z_dim, y_dim, s_dim):
     # KL(q(s|x)|p(s))
     log_pi = q_params['s']
     pi_param = tf.nn.softmax(log_pi)
-    KL_s = -tf.nn.softmax_cross_entropy_with_logits(logits=log_pi, labels=pi_param) + tf.log(float(s_dim))
+    KL_s = -tf.nn.softmax_cross_entropy_with_logits_v2(logits=log_pi, labels=tf.stop_gradient(pi_param)) + tf.math.log(
+        float(s_dim))
 
     # KL(q(z|s,x)|p(z|s))
     mean_pz, log_var_pz = p_params['z']
     mean_qz, log_var_qz = q_params['z']
     KL_z = -0.5 * z_dim + 0.5 * tf.reduce_sum(
-        tf.exp(log_var_qz - log_var_pz) + tf.square(mean_pz - mean_qz) / tf.exp(log_var_pz) - log_var_qz + log_var_pz,
+        tf.exp(log_var_qz - log_var_pz) + tf.math.square(mean_pz - mean_qz) / tf.exp(log_var_pz) - log_var_qz +
+        log_var_pz,
         1)
 
     # Eq[log_p(x|y)]
@@ -97,7 +99,8 @@ def samples_generator(batch_data_list, X_list, miss_list, types_list, batch_size
 
     # Create deterministic layer y
     samples_test['y'] = tf.layers.dense(inputs=samples_test['z'], units=y_dim, activation=None,
-                                        kernel_initializer=tf.random_normal_initializer(stddev=0.05), name='layer_h1_',
+                                        kernel_initializer=tf.random_normal_initializer(stddev=0.05),
+                                        name='layer_h1_',
                                         reuse=True)
 
     grouped_samples_y = VAE_functions.y_partition(samples_test['y'], types_list, y_dim_partition)
