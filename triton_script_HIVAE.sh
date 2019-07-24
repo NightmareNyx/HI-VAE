@@ -3,7 +3,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --time=00:15:00
 #SBATCH --constraint=volta
-module load cuda/10.0.130 cudnn/7.4.2-cuda anaconda3/2019-03
+module load cuda/10.0.130 cudnn/7.4.2-cuda anaconda3/2019-03-gpu
 
 declare dataset="Wine"
 declare batch_size=100
