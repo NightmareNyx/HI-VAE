@@ -19,6 +19,12 @@ import parser_arguments
 # import plot_functions
 import read_functions
 
+# os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+if tf.test.gpu_device_name():
+    print('GPU found!')
+    print(tf.test.gpu_device_name())
+else:
+    print("No GPU found. Using CPU instead")
 
 def print_loss(epoch, start_time, avg_loss, avg_test_loglik, avg_KL_s, avg_KL_z):
     print("Epoch: [%2d]  time: %4.4f, train_loglik: %.8f, KL_z: %.8f, KL_s: %.8f, ELBO: %.8f, Test_loglik: %.8f"
